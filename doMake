@@ -1,0 +1,6 @@
+rm -f Minesweeper
+ghc -o Minesweeper -O2          \
+    -hidir build                \
+    -odir build                 \
+    -main-is Minesweeper        \
+    -isrc src/Minesweeper.hs    \

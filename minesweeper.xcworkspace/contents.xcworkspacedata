@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "container:src/Grid.hs">
+   </FileRef>
+   <FileRef
+      location = "group:src/Input.hs">
+   </FileRef>
+   <FileRef
+      location = "group:src/Logic.hs">
+   </FileRef>
+   <FileRef
+      location = "group:src/Minesweeper.hs">
+   </FileRef>
+   <FileRef
+      location = "group:src/Misc.hs">
+   </FileRef>
+   <FileRef
+      location = "group:src/Numerals.hs">
+   </FileRef>
+</Workspace>

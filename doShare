@@ -1,0 +1,1 @@
+doMake && cp Minesweeper Minesweeper.unstripped && strip Minesweeper && zip Minesweeper Minesweeper && rm Minesweeper && mv Minesweeper.unstripped Minesweeper && mv Minesweeper.zip ~/Dropbox/Public

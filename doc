@@ -1,0 +1,2 @@
+#haddock -o docs -h src/Grid.hs src/Input.hs src/Logic.hs src/Misc.hs
+haddock -o docs -h src/*.hs
