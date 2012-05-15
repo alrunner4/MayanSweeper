@@ -115,14 +115,10 @@ neighborCells g ( x , y ) = [ ( x - 1 , y - 1 ) , ( x , y - 1 ) , ( x + 1 , y - 
 -- MineGrid Transformations --
 ------------------------------
 
-alterLocation g l f =
-  let
-    old = stateForLocation g l
-  in
-    case old of
-      Nothing -> g
-      Just s  -> if not $ inRange ( gridBounds g ) l then g
-                 else MineGrid $ arrayForGrid g // [ ( l , f s ) ]
+alterLocation g l f = case stateForLocation g l of
+  Nothing -> g
+  Just s  -> if not $ inRange ( gridBounds g ) l then g
+             else MineGrid $ arrayForGrid g // [ ( l , f s ) ]
 
 
 flagLocation mg l = alterLocation mg l withFlag

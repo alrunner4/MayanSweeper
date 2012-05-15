@@ -10,10 +10,12 @@ module Logic
     won,
     -- ** Construction
     initialGameState,
+    -- ** Transformation
     advanceGameState
   )
   where
 
+import Data.Maybe ( mapMaybe )
 import Data.Time.Clock
 import Grid
 import Input
@@ -41,8 +43,8 @@ initialGameState gen t = GameState
 
 advanceGameState :: GameState -> InputState -> GameState
 advanceGameState game input | exploded game    = doNothing
-                            | ( not . won ) game && gameIsWon = game { won = True }
                             | won game         = doNothing
+                            | gameIsWon        = game { won = True }
                             | lmbClicked input = gameAfterClick { gameTime = currentTime input }
                             | rmbClicked input = gameAfterRightClick { gameTime = currentTime input }
                             | otherwise        = game { gameTime = currentTime input }
@@ -63,37 +65,43 @@ advanceGameState game input | exploded game    = doNothing
     selectedPos = ( xCellMouse input , yCellMouse input )
     
     maybeLocation = stateForLocation grid selectedPos
-    
-    mineIsSelected = case maybeLocation of
-                       Nothing -> False
-                       Just loc -> isMine loc
-    
+        
     flagIsSelected = case maybeLocation of
-                       Nothing -> False
-                       Just loc -> isFlagged loc
+      Nothing -> False
+      Just loc -> isFlagged loc
     
     clearIsSelected = case maybeLocation of
-                        Nothing -> False
-                        Just loc -> isCleared loc
+      Nothing -> False
+      Just loc -> isCleared loc
     
-    recursiveClear :: MineGrid -> ( Int , Int ) -> MineGrid
-    recursiveClear g pos = case stateForLocation grid pos of
-                           Nothing -> g
-                           Just loc -> if g `minesNeighboringLocation` pos == 0
-                             then
-                               foldr ($) ( g `clearLocation` pos ) toClearFuncs
-                             else
-                               g `clearLocation` pos
+    doClear :: GameState -> ( Int , Int ) -> GameState
+    doClear g pos = case ( mineGrid g ) `stateForLocation` pos of
+      Nothing -> g
+      Just loc -> if isMine loc
+        then
+          explode $ clearLoc pos
+        else if ( mineGrid g ) `minesNeighboringLocation` pos == 0
+        then
+          g `recursiveClear` pos
+        else
+          g { mineGrid = mineGrid g `clearLocation` pos }
+
+    recursiveClear :: GameState -> ( Int , Int ) -> GameState
+    recursiveClear g pos = case stateForLocation ( mineGrid g ) pos of
+      Nothing -> g
+      Just loc -> foldr ($) g { mineGrid = mineGrid g `clearLocation` pos } toClearFuncs
       where
-        toClear = filter ( \ ( _ , l ) -> ( not $ isCleared l ) && ( not $ isFlagged l ) ) ( neighborsOfLocation g pos )
-        toClearFuncs = map ( \ ( p , _ ) -> ( `recursiveClear` p ) ) toClear
+        toClear = filter ( \ ( _ , l ) -> ( not $ isCleared l ) && ( not $ isFlagged l ) ) ( neighborsOfLocation ( mineGrid g ) pos )
+        toClearFuncs = map ( \ ( p , _ ) -> ( `doClear` p ) ) toClear
     
-    -- recursiveClearMultiple g [] = g
-    -- recursiveClearMultiple g ( p : ps ) = case stateForLocation grid p of
-    --   Nothing -> recursiveClearMultiple g ps
-    --   Just loc -> ( g `clearLocation` p ) `recursiveClearMultiple` 
-    --   where
-    --     toClear = filter ( not . isCleared . snd ) ( neighborsOfLocation g pos )
+    adjacentClear :: GameState -> ( Int , Int ) -> GameState
+    adjacentClear g pos = case stateForLocation ( mineGrid g ) pos of
+      Nothing -> g
+      Just loc -> foldr ($) g toClearFuncs
+        where
+          neighbors = mineGrid g `neighborsOfLocation` pos
+          toClear = mapMaybe ( \ ( p , s ) -> if isCleared s then Nothing else if isFlagged s then Nothing else Just p ) neighbors
+          toClearFuncs = map ( \ p -> ( `doClear` p ) ) toClear
     
     gameIsWon = unclearedLeft grid == 0
     
@@ -103,9 +111,17 @@ advanceGameState game input | exploded game    = doNothing
     
     doNothing = game
     
-    gameAfterClick = if mineIsSelected && not flagIsSelected then explode game else
-                     if flagIsSelected then doNothing else
-                        game { mineGrid = grid `recursiveClear` selectedPos }
+    gameAfterClick =
+      if flagIsSelected
+        then
+          doNothing
+        else
+          game `doClear` selectedPos
     
-    gameAfterRightClick = if not clearIsSelected then toggleFlag selectedPos else doNothing
+    gameAfterRightClick =
+      if not clearIsSelected
+        then
+          toggleFlag selectedPos
+        else
+          game `adjacentClear` selectedPos
 

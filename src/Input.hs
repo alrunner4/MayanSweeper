@@ -23,6 +23,7 @@ module Input
     rmbWasDown,
     -- *** Time
     currentTime,
+    diffTime,
     -- ** Events
     newGameRequested,
     
@@ -38,7 +39,7 @@ import Data.Time.Clock
 import Graphics.UI.GLFW
 import Grid
 import Misc
-import System.Random ( StdGen, getStdGen )
+import System.Random ( StdGen, getStdGen, next )
 
 -----------------
 -- Input State --
@@ -52,6 +53,7 @@ data InputState = InputState
     lmb :: ButtonState,
     rmb :: ButtonState,
     currentTime :: UTCTime,
+    diffTime :: NominalDiffTime,
     newGame :: ButtonState,
     rand :: StdGen
   }
@@ -68,6 +70,7 @@ noInput = do
       lmb = buttonStateClear,
       rmb = buttonStateClear,
       currentTime = t,
+      diffTime = t `diffUTCTime` t,
       newGame = buttonStateClear,
       rand = r
     }
@@ -121,5 +124,7 @@ captureInputs prev ( gridw , gridh ) = do
       lmb = ButtonState leftMouse ( lmbDown prev ),
       rmb = ButtonState rightMouse ( rmbDown prev ),
       currentTime = now,
-      newGame = ButtonState newGameRequest ( buttonDown $ newGame prev )
+      diffTime = now `diffUTCTime` currentTime prev,
+      newGame = ButtonState newGameRequest ( buttonDown $ newGame prev ),
+      rand = if newGameRequested prev then ( snd $ next $ rand prev ) else rand prev
     }
