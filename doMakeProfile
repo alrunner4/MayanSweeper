@@ -1,0 +1,9 @@
+rm -f Minesweeper
+ghc -o Minesweeper              \
+    -prof                       \
+    -fprof-auto                 \
+    -rtsopts                    \
+    -hidir build                \
+    -odir build                 \
+    -main-is Minesweeper        \
+    -isrc src/Minesweeper.hs    \
