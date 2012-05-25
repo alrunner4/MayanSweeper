@@ -39,7 +39,7 @@ import Data.Time.Clock
 import Graphics.UI.GLFW
 import Grid
 import Misc
-import System.Random ( StdGen, getStdGen, next )
+import System.Random ( StdGen, getStdGen, split )
 
 -----------------
 -- Input State --
@@ -116,6 +116,9 @@ captureInputs prev ( gridw , gridh ) = do
   let xMappedMouse = ( xRawMouse `divf` winw - 0.5 ) * 2
       yMappedMouse = ( negate $ yRawMouse `divf` winh - 0.5 ) * 2
   
+  let newGameButtonState = ButtonState newGameRequest ( buttonDown $ newGame prev )
+      isNewGameRequested = buttonClicked newGameButtonState
+
   return prev {
       xPosMouse = xMappedMouse,
       yPosMouse = yMappedMouse,
@@ -125,6 +128,6 @@ captureInputs prev ( gridw , gridh ) = do
       rmb = ButtonState rightMouse ( rmbDown prev ),
       currentTime = now,
       diffTime = now `diffUTCTime` currentTime prev,
-      newGame = ButtonState newGameRequest ( buttonDown $ newGame prev ),
-      rand = if newGameRequested prev then ( snd $ next $ rand prev ) else rand prev
+      newGame = newGameButtonState,
+      rand = if isNewGameRequested then ( fst $ split $ rand prev ) else rand prev
     }
