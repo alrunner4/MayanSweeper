@@ -1,0 +1,22 @@
+{
+	"folders": [ {
+		"path": ".",
+		"file_exclude_patterns": [
+			"*.gif",
+			"*.html",
+			"*.js",
+			"*.sublime-*",
+			".*"
+		],
+		"folder_exclude_patterns": [
+			"*.xcworkspace",
+			".*",
+			"_darcs",
+			"build",
+			"docs"
+		]
+	} ],
+	"settings": {
+		"rulers": [ 80 ]
+	}
+}
