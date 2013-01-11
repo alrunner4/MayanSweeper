@@ -1,7 +1,6 @@
 
 module Misc where
 
-import Data.Monoid
 import Graphics.Rendering.OpenGL as OpenGL
 
 ---------
@@ -53,18 +52,18 @@ color3d r g b = Color3 ( realToFrac r ) ( realToFrac g ) ( realToFrac b )
 
 renderFilledRect :: ( Color c , VertexComponent v ) => c -> Vertex2 v -> Vertex2 v -> IO ()
 renderFilledRect c ( Vertex2 x1 y1 ) ( Vertex2 x2 y2 ) = renderPrimitive Quads $ do
-  color c
-  vertex $ Vertex2 x1 y1
-  vertex $ Vertex2 x2 y1
-  vertex $ Vertex2 x2 y2
-  vertex $ Vertex2 x1 y2
+	color c
+	vertex $ Vertex2 x1 y1
+	vertex $ Vertex2 x2 y1
+	vertex $ Vertex2 x2 y2
+	vertex $ Vertex2 x1 y2
 
 renderOutlineRect :: ( Color c , VertexComponent v ) => c -> Vertex2 v -> Vertex2 v -> IO ()
 renderOutlineRect c ( Vertex2 x1 y1 ) ( Vertex2 x2 y2 ) = renderPrimitive LineLoop $ do
-  color c
-  vertex $ Vertex2 x1 y1
-  vertex $ Vertex2 x2 y1
-  vertex $ Vertex2 x2 y2
-  vertex $ Vertex2 x1 y2
+	color c
+	vertex $ Vertex2 x1 y1
+	vertex $ Vertex2 x2 y1
+	vertex $ Vertex2 x2 y2
+	vertex $ Vertex2 x1 y2
 
 usingMatrix m f = preservingMatrix $ do multMatrix m ; f
