@@ -60,7 +60,7 @@ display game input = let
 					renderMineCount = if ( isMine loc ) || ( not $ isCleared loc ) || ( isFlagged loc )
 						then return ()
 						else preservingMatrix $ do
-							 translate $ Vector3 ( realToFrac left ) ( realToFrac bot ) ( 0 :: GLdouble )
+							 translate $ Vector3 left bot 0
 							 scale ( realToFrac minew ) ( realToFrac mineh ) ( 1 :: GLdouble )
 							 renderNumeral $ minesNeighboringLocation ( mineGrid game ) ( cx , cy )
 
